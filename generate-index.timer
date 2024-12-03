@@ -1,0 +1,10 @@
+[Unit]
+Description=Generate Index @ 05:00
+
+[Timer]
+OnCalendar=05:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+

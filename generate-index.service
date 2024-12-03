@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Service
+
+[Service]
+User=webgen
+Group=webgen
+ExecStart=/var/lib/webgen/bin/generate_index
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

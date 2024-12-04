@@ -10,7 +10,7 @@
 The purpose of this README is to document the process of setting up and configuring a web server using Nginx, and a load balancer. It provides clear instructions for creating a system user, organizing file structures, and automating services with timers. This README also explains why specific choices were made, such as the use of a system user and the purpose of a load balancer.
 
 
-## Create Project
+## Create a Project on DigitalOcean
 
 
 ## Create Droplet
@@ -22,6 +22,26 @@ Select the following settings for both droplets:
     Add a tag: web
 
 Repeat this process for the second droplet.
+
+We will also add these droplets into our localmachines `.ssh` folder.
+
+```
+Host drop1
+  HostName 143.198.111.224
+  User arch
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/do-key
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+
+Host drop2
+  HostName 143.198.109.183
+  User arch
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/do-key
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+```
 
 
 ## Create a Load Balancer in DigitalOcean
@@ -38,10 +58,26 @@ Repeat this process for the second droplet.
 
 Click "Create Load Balancer" to finalize the setup.
 
-## Setting Up a New Server
+> [!Note]
+> You may get an error, on your load-balancer this is due to nginx not yet running on your droplets.
 
 #### Intial Step
-We will be creating a user, using the following command:
+
+In each of the droplets, we will be doing the following commands.
+
+First we'll sync, refresh and update all packages.
+
+``` linux
+sudo pacman -Syu
+```
+
+Then we can install the required packages.
+
+``` linux
+sudo pacman -S neovim nginx git ufw
+```
+
+We will be creating a user, using the following command in both of the droplets:
 
 ``` linux
 sudo useradd --system -d /var/lib/webgen -s /usr/sbin/nologin webgen
@@ -49,7 +85,10 @@ sudo useradd --system -d /var/lib/webgen -s /usr/sbin/nologin webgen
 
 This will simply create a system user for you called `webgen`
 
+System users are created by the system during installation and are used to run system services and applications. When creating the --system user we set the /usr/sbin/nologin preventing direct logins to the account. It limits the privileges and also access to sensitive parts of the system
+
 #### Create Directories and Changing Ownership
+
 Now we'll make directories for the necessary files inside of webgens home directory
 ``` linux
 sudo mkdir /var/lib/webgen/HTML

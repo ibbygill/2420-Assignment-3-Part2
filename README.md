@@ -1,10 +1,42 @@
 # 2420-Assignment-3
 ### Assignment 3 Linux
 
-#### Click on the link to visit the working server [164.92.88.167](http://164.92.88.167/)
+##### Click on the link to visit the working load balancer [HERE](http://209.38.5.95/)
 
-If you also want to also setup a new server, this is a quick guide to help you do that.
+##### If you want to see the documents click on this link [HERE](http://209.38.5.95/documents) 
 
+## Purpose
+
+The purpose of this README is to document the process of setting up and configuring a web server using Nginx, and a load balancer. It provides clear instructions for creating a system user, organizing file structures, and automating services with timers. This README also explains why specific choices were made, such as the use of a system user and the purpose of a load balancer.
+
+
+## Create Project
+
+
+## Create Droplet
+Select the following settings for both droplets:
+
+    Image: Arch Linux
+    Region: SFO3
+    Plan: Basic, 1 vCPU, 1GB RAM (minimum required)
+    Add a tag: web
+
+Repeat this process for the second droplet.
+
+
+## Create a Load Balancer in DigitalOcean
+    Go to Networking > Load Balancers and click "Create Load Balancer".
+
+    Set the following options:
+        Region: SFO3 (same as your droplets).
+        Forwarding Rule:
+            Load Balancer: HTTP, Port 80.
+            Droplet: HTTP, Port 80.
+
+        Add Droplets:
+            Use the web tag to automatically include all droplets with the web tag.
+
+Click "Create Load Balancer" to finalize the setup.
 
 ## Setting Up a New Server
 

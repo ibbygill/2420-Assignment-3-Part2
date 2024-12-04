@@ -1,5 +1,7 @@
 [Unit]
 Description=Run Service
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 User=webgen

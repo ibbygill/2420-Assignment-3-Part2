@@ -1,9 +1,12 @@
 # 2420-Assignment-3
 ### Assignment 3 Linux
 
-##### Click on the link to visit the working load balancer [HERE](http://209.38.5.95/)
+##### Click on the link to visit the working load balancer [Loadbalancer](http://209.38.5.95/)
 
-##### If you want to see the documents click on this link [HERE](http://209.38.5.95/documents) 
+##### If you want to see the documents in the load balancer click on this link [Loadbalancer/Documents](http://209.38.5.95/documents) 
+
+##### Working Droplet#1  [DROP1](http://143.198.111.224/)
+##### Working Droplet#2  [DROP2](http://143.198.109.183/)
 
 ## Purpose
 
@@ -153,35 +156,60 @@ sudo systemctl status generate-index.service
 ```
 
 #### Nginx Install and Conf File
-Next, we'll ensure that you have nginx installed on your machine by running the command below.
 
-Now we can move into the .conf file to set webgen as the user and create the server block configuration as included.
-
-Go into your nginx.conf file and update the `user` so it says `user webgen;`, it is usually commented out in the .conf file.
-
-Run the next command, this is where you will be pasting the server.conf file. Ensure that you change the server_name and check that the root is pointing to the correct HTML path so it can find the index.html to show on screen. The location {  } is used so that it checks
-
-``` linux 
-sudo nvim /etc/nginx/sites-available/webgen
-```
-
-After pasting the server.conf file and changing the server_name to your own, run the command below.
+Move the nginx.conf file into the correct directory using the following command
 
 ``` linux
-sudo ln -s /etc/nginx/sites-available/webgen /etc/nginx/sites-enabled/webgen
-sudo nginx -t
-sudo systemctl restart nginx
+sudo cp nginx.conf /etc/nginx/
 ```
 
-This will enable the server block, and it should be up and running now.
+Next, we'll create two directories `sites-available` and `sites-enabled` this will be used to put our new server block into. We do this as it is best practice in the future when adding more configurations.
+
+``` linux
+sudo mkdir -p /etc/nginx/sites-available
+sudo mkdir -p /etc/nginx/sites-enabled
+```
+
+Now we will move the server.conf into the sites-avaiable we created using the command below.
+
+``` linux
+sudo cp server.conf /etc/nginx/sites-available/
+```
+
+Finally, creating a symlink with our sites-enabled directory 
+
+``` linux
+sudo ln -s /etc/nginx/sites-available/server_block.conf /etc/nginx/sites-enabled/
+```
+
+This creates a symbolic link that we can use to enable or disable a site by simply creating or unlinking a symlink. All of these steps can be found https://wiki.archlinux.org/title/Nginx
+
+Lastly, we can test our `nginx server` by running the command below
+
+``` linux
+sudo nginx -t
+```
+
+This will show that it is successful, telling you that it is up and running.
+
+Checking the status of nginx by running the command below is
+
+``` linux
+sudo systemctl status nginx
+```
+
+In case, there are modifications you have made, run the following command which will reload the nginx server.
+
+``` linux
+sudo systemctl reload nginx
+```
+
+#### UFW
+
 
 The next steps will install UFW which is a friendly way to create a firewall for your IPv4 or IPv6 host.
 
-``` linux
-sudo pacman -S ufw
-```
-
-Next we will ensure that you allow ssh and http, this is so we can access the server using ssh and http so that the files can be hosted on the site.
+Since, we already installed ufw in a step prior we will ensure that you allow ssh and http, this is so we can access the server using ssh and http so that the files can be hosted on the site.
 
 ``` linux
 sudo ufw allow http
@@ -196,12 +224,23 @@ sudo ufw limit ssh
 
 Now run the following to enable the firewall
 ``` linux
-sudo ufw enable
+sudo ufw enable --now ufw.service
 ```
 
 You can verify the status by running
 ``` linux
 sudo ufw status verbose
+```
+
+You will see the following:
+
+``` linux
+To                         Action      From
+--                         ------      ----
+80/tcp                     ALLOW IN    Anywhere
+22/tcp                     ALLOW IN    Anywhere
+80/tcp (v6)                ALLOW IN    Anywhere (v6)
+22/tcp (v6)                ALLOW IN    Anywhere (v6)
 ```
 
 #### Troubleshooting

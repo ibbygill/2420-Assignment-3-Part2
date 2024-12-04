@@ -61,7 +61,7 @@ Click "Create Load Balancer" to finalize the setup.
 > [!Note]
 > You may get an error, on your load-balancer this is due to nginx not yet running on your droplets.
 
-#### Intial Step
+## Initial Step
 
 In each of the droplets, we will be doing the following commands.
 
@@ -87,7 +87,7 @@ This will simply create a system user for you called `webgen`
 
 System users are created by the system during installation and are used to run system services and applications. When creating the --system user we set the /usr/sbin/nologin preventing direct logins to the account. It limits the privileges and also access to sensitive parts of the system
 
-#### Create Directories and Changing Ownership
+## Create Directories and Changing Ownership
 
 Now we'll make directories for the necessary files inside of webgens home directory
 ``` linux
@@ -99,17 +99,34 @@ We will run the following command
 sudo chown -R webgen:webgen /var/lib/webgen
 ```
 
-This ensures that the ownership is changed to our new user `webgen` for all directories we've created and other directories inside of `/var/lib/webgen`
+-R ensures that the change applies recursively to all files and subdirectories
 
-`webgen` user tree should look like the following:
+webgen:webgen is for OWNER:GROUP
+
+
+Now you will ensure that the ownership is changed to our new user `webgen` for all directories we've created and other directories inside of `/var/lib/webgen`
+
+If you want to clone this repo, and move the appropriate directories and files into the correct spots. That is also an option using the git clone method.
+
+Then  using `mv` commands to move the files into their correct spots.
+
+Your `webgen` user tree should look like the following:
 
 ``` linux
 /var/lib/webgen/
-
 ├── bin/
-│   └── generate_index   # copy the generate_index into bin
-└── HTML/
-    └── index.html       # copy the index.html into HTML folder
+│   └── generate_index   # Copy the generate_index script here
+├── HTML/
+│   └── index.html       # Place the main index.html here
+└── documents/
+    ├── file-one         # Example file for directory listing
+    └── file-two         # copy the index.html into HTML folder
+```
+
+Ensure that the generate_index script is given executable permissions, as we will be using the .service file to run the generate_index script inside of /bin
+
+``` linux
+chmod +x /var/lib/webgen/bin/generate_index
 ```
 
 #### Move .service and .timer Files
@@ -122,17 +139,22 @@ mv generate-index.timer /etc/systemd/system/
 ```
 Once these commands are run, you will need to enable the .service and .timer files. 
 
-```
+``` linux
+sudo systemctl start generate-index.service
 sudo systemctl enable generate-index.service
-sudo systemctl enable generate-index.timer
+sudo systemctl enable --now generate-index.timer
+```
+
+Now after we have started our .service and .timer we can check if the .timer file and .service file are active, by running 
+
+``` linux
+sudo systemctl status generate-index.timer
+sudo systemctl status generate-index.service
 ```
 
 #### Nginx Install and Conf File
 Next, we'll ensure that you have nginx installed on your machine by running the command below.
 
-``` linux 
-sudo pacman -S nginx
-```
 Now we can move into the .conf file to set webgen as the user and create the server block configuration as included.
 
 Go into your nginx.conf file and update the `user` so it says `user webgen;`, it is usually commented out in the .conf file.
